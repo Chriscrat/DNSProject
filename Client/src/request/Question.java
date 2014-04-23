@@ -6,6 +6,6 @@ package request;
 public class Question {
 
     public StringBuilder QNAME;
-    public String QTYPE;
-    public String QCLASS;
+    public int QTYPE;
+    public int QCLASS;
 }
