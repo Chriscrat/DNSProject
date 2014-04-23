@@ -41,9 +41,26 @@ public class DNSRequestParser {
      * @param output : the initialised list to fill with parsed questions
      * @return the number of byte read
      */
-    public int  parseAnswers(int number,byte[] unparsedRequest ,List<Question> output){
+    public int  parseAnswers(int number, byte[] unparsedRequest , List<Question> output){
         assert output != null;
 
-        return -1;
+        int byteRead=0;
+        int wordLength;
+        Question question;
+
+        for(int cursor = 12; cursor<unparsedRequest.length;cursor++){
+            for(int q =0; q<number;q++) {
+                question = new Question();
+                while (unparsedRequest[cursor] != 0) {
+                    wordLength = unparsedRequest[cursor];
+                    cursor += wordLength;
+                    for (int i = 0; i < wordLength; i++)
+                        question.QNAME.append((char) unparsedRequest[i]);
+                    byteRead += cursor;
+                }
+                output.add(q,question);
+            }
+        }
+        return byteRead;
     }
 }
