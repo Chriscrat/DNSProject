@@ -13,14 +13,14 @@ import java.util.List;
  */
 public class DNSRequestParser {
 
-    public static Request parseRequest(byte[] unparsedRequest){
+    public static Request parseRequest(byte[] unparsedRequest) {
         return null;
     }
 
-    public static Header parseHeader(byte[] unparsedRequest){
+    public static Header parseHeader(byte[] unparsedRequest) {
         Header header = new Header();
 
-        header.ID = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[1],unparsedRequest[0]);
+        header.ID = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[1], unparsedRequest[0]);
 
         header.QRisResponse = BitMask.RESPONSE.isSetIn(unparsedRequest[2]);
         header.AA = BitMask.AA.isSetIn(unparsedRequest[2]);
@@ -37,20 +37,19 @@ public class DNSRequestParser {
     }
 
     /**
-     *
      * @param output : the initialised list to fill with parsed questions
      * @return the number of byte read
      */
-    public int  parseAnswers(int number, byte[] unparsedRequest , List<Question> output){
+    public static int parseAnswers(int number, byte[] unparsedRequest, List<Question> output) {
         assert output != null;
 
-        int byteRead=0;
+        int byteRead = 0;
         int wordLength;
-        String currentWord="";
+        String currentWord = "";
         Question question;
 
-        for(int cursor = 12; cursor<unparsedRequest.length;cursor++){
-            for(int q =0; q<number;q++) {
+        for (int cursor = 12; cursor < unparsedRequest.length; cursor++) {
+            for (int q = 0; q < number; q++) {
                 question = new Question();
                 while (unparsedRequest[cursor] != 0) {
                     wordLength = unparsedRequest[cursor];
@@ -59,13 +58,13 @@ public class DNSRequestParser {
                     for (int i = 0; i < wordLength; i++)
                         currentWord += (char) unparsedRequest[i];
 
-                    question.QNAME.append(currentWord+".");
+                    question.QNAME.append(currentWord + ".");
                     byteRead += cursor;
                 }
-                question.QTYPE = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+1], unparsedRequest[cursor]);
-                question.QCLASS = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+3], unparsedRequest[cursor+2]);
+                question.QTYPE = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor + 1], unparsedRequest[cursor]);
+                question.QCLASS = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor + 3], unparsedRequest[cursor + 2]);
 
-                output.add(q,question);
+                output.add(q, question);
             }
         }
         return byteRead;

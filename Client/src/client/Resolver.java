@@ -83,7 +83,7 @@ public class Resolver {
         return offset;
     }
 
-    void ask(String dnsAdr, String url) throws IOException {
+    byte[] ask(String dnsAdr, String url) throws IOException {
         final DatagramSocket dnsServer = new DatagramSocket(port);
 
         byte[] message = new byte[buffSize];
@@ -95,35 +95,40 @@ public class Resolver {
 
         final Object wait = new Object();
 
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("C'mon google talk to me");
-                    dnsServer.receive(received);
-                    wait.notify();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    System.out.println("C'mon google talk to me");
+//                    dnsServer.receive(received);
+//                    synchronized (wait){
+//                    wait.notify();
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                System.out.println(packet);
+//            }
+//        };
 
-                System.out.println(packet);
-            }
-        };
-
-        thread.start();
+//        thread.start();
 
         dnsServer.send(packet);
+        dnsServer.receive(received);
+        return received.getData();
 
 
-        synchronized (wait) {
-            try {
-                System.out.println("I'mw aiting");
-                wait.wait();
-                System.out.println("Let's go home");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+
+//        synchronized (wait) {
+//            try {
+//                System.out.println("I'mw aiting");
+//                wait.wait();
+//                System.out.println("Let's go home");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
 
     }
