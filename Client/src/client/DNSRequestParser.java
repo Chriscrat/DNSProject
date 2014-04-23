@@ -62,8 +62,8 @@ public class DNSRequestParser {
                     question.QNAME.append(currentWord+".");
                     byteRead += cursor;
                 }
-                question.QTYPE = String.valueOf(ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+1], unparsedRequest[cursor]));
-                question.QCLASS = String.valueOf(ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+3], unparsedRequest[cursor+2]));
+                question.QTYPE = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+1], unparsedRequest[cursor]);
+                question.QCLASS = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor+3], unparsedRequest[cursor+2]);
 
                 output.add(q,question);
             }
