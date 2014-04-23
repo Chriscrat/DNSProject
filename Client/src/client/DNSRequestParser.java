@@ -46,6 +46,7 @@ public class DNSRequestParser {
 
         int byteRead=0;
         int wordLength;
+        String currentWord="";
         Question question;
 
         for(int cursor = 12; cursor<unparsedRequest.length;cursor++){
@@ -54,8 +55,11 @@ public class DNSRequestParser {
                 while (unparsedRequest[cursor] != 0) {
                     wordLength = unparsedRequest[cursor];
                     cursor += wordLength;
+
                     for (int i = 0; i < wordLength; i++)
-                        question.QNAME.append((char) unparsedRequest[i]);
+                        currentWord += (char) unparsedRequest[i];
+
+                    question.QNAME.append(currentWord+".");
                     byteRead += cursor;
                 }
                 output.add(q,question);
