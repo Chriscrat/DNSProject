@@ -4,7 +4,7 @@ import request.BitMask;
 import request.Header;
 import request.Question;
 import request.Request;
-import utils.ByteArrayConversionTool;
+import utils.ByteConversionTool;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class DNSRequestParser {
     public static Header parseHeader(byte[] unparsedRequest) {
         Header header = new Header();
 
-        header.ID = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[1], unparsedRequest[0]);
+        header.ID = ByteConversionTool.bytesToInt(unparsedRequest[1], unparsedRequest[0]);
 
         header.QRisResponse = BitMask.RESPONSE.isSetIn(unparsedRequest[2]);
         header.AA = BitMask.AA.isSetIn(unparsedRequest[2]);
@@ -28,10 +28,10 @@ public class DNSRequestParser {
         header.RD = BitMask.RD.isSetIn(unparsedRequest[2]);
         header.RA = BitMask.RA.isSetIn(unparsedRequest[2]);
 
-        header.QDCOUNT = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[5], unparsedRequest[4]);
-        header.ANCOUNT = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[7], unparsedRequest[6]);
-        header.NSCOUNT = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[9], unparsedRequest[8]);
-        header.ARCOUNT = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[11], unparsedRequest[10]);
+        header.QDCOUNT = ByteConversionTool.bytesToInt(unparsedRequest[5], unparsedRequest[4]);
+        header.ANCOUNT = ByteConversionTool.bytesToInt(unparsedRequest[7], unparsedRequest[6]);
+        header.NSCOUNT = ByteConversionTool.bytesToInt(unparsedRequest[9], unparsedRequest[8]);
+        header.ARCOUNT = ByteConversionTool.bytesToInt(unparsedRequest[11], unparsedRequest[10]);
 
         return header;
     }
@@ -43,30 +43,32 @@ public class DNSRequestParser {
     public static int parseAnswers(int number, byte[] unparsedRequest, List<Question> output) {
         assert output != null;
 
-        int byteRead = 0;
-        int wordLength;
-        String currentWord = "";
-        Question question;
+        //questions begins at twelve bytes from the unparsedRequest start
+        int readingCursor = 12;
 
-        for (int cursor = 12; cursor < unparsedRequest.length; cursor++) {
-            for (int q = 0; q < number; q++) {
-                question = new Question();
-                while (unparsedRequest[cursor] != 0) {
-                    wordLength = unparsedRequest[cursor];
-                    cursor += wordLength;
+        for (int i = 0; i < number; i++) {
+            Question question = new Question();
 
-                    for (int i = 0; i < wordLength; i++)
-                        currentWord += (char) unparsedRequest[i];
+            StringBuilder qname = new StringBuilder();
+            readingCursor = readName(readingCursor,unparsedRequest,qname);
+            question.QNAME = qname.toString();
 
-                    question.QNAME.append(currentWord + ".");
-                    byteRead += cursor;
-                }
-                question.QTYPE = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor + 1], unparsedRequest[cursor]);
-                question.QCLASS = ByteArrayConversionTool.byteArrayToInt(unparsedRequest[cursor + 3], unparsedRequest[cursor + 2]);
+            question.QTYPE = ByteConversionTool.bytesToInt(unparsedRequest[++readingCursor], unparsedRequest[++readingCursor]);
+            question.QCLASS = ByteConversionTool.bytesToInt(unparsedRequest[++readingCursor], unparsedRequest[++readingCursor]);
 
-                output.add(q, question);
-            }
+            output.add(question);
         }
-        return byteRead;
+
+        return readingCursor;
+    }
+
+    public static int readName(int offset, byte[] bytes, StringBuilder output){
+        int wordLength;
+        while(0 != (wordLength = ByteConversionTool.bytesToInt(bytes[offset]))){
+            output.append(ByteConversionTool.asciiBytesToString(wordLength, ++offset, bytes));
+            output.append('.');
+            offset +=wordLength;
+        }
+        return offset;
     }
 }

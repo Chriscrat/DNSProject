@@ -2,6 +2,7 @@ package client;
 
 import request.Header;
 import request.Question;
+import utils.ByteConversionTool;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,9 +25,10 @@ public class ResolverLauncher {
 
             Header header = DNSRequestParser.parseHeader(answer);
             List<Question> questions = new ArrayList<>();
-            DNSRequestParser.parseAnswers(header.QDCOUNT,answer,questions);
+            int offset = DNSRequestParser.parseAnswers(header.QDCOUNT,answer,questions);
 
-            System.out.println(header);
+            System.out.println(ByteConversionTool.asciiBytesToString(answer.length - offset,offset,answer));
+
 
         } catch (IOException e) {
             e.printStackTrace();

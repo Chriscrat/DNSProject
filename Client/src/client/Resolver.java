@@ -68,14 +68,6 @@ public class Resolver {
         System.arraycopy(QCLASS, 0, message, offset, QCLASS.length);
         offset += QCLASS.length;
 
-//          24 1a 81 80 00 01
-//          00 03 00 00 00 00 03 77  77 77 06 67 6f 6f 67 6c
-//          65 03 63 6f 6d 00 00 01  00 01 c0 0c 00 05 00 01
-//          00 05 28 39 00 12 03 77  77 77 01 6c 06 67 6f 6f
-//          67 6c 65 03 63 6f 6d 00  c0 2c 00 01 00 01 00 00
-//          00 e3 00 04 42 f9 59 63  c0 2c 00 01 00 01 00 00
-//          00 e3 00 04 42 f9 59 68
-
         for(byte b : message){
             System.out.print(String.format("%02x ", b));
         }
@@ -87,6 +79,8 @@ public class Resolver {
         final DatagramSocket dnsServer = new DatagramSocket(port);
 
         byte[] message = new byte[buffSize];
+
+
 
         int offset = populate(message,url);
 
