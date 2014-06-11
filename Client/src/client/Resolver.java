@@ -68,10 +68,6 @@ public class Resolver {
         System.arraycopy(QCLASS, 0, message, offset, QCLASS.length);
         offset += QCLASS.length;
 
-        for(byte b : message){
-            System.out.print(String.format("%02x ", b));
-        }
-
         return offset;
     }
 
@@ -89,42 +85,10 @@ public class Resolver {
 
         final Object wait = new Object();
 
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    System.out.println("C'mon google talk to me");
-//                    dnsServer.receive(received);
-//                    synchronized (wait){
-//                    wait.notify();
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                System.out.println(packet);
-//            }
-//        };
-
-//        thread.start();
 
         dnsServer.send(packet);
         dnsServer.receive(received);
         return received.getData();
-
-
-
-//        synchronized (wait) {
-//            try {
-//                System.out.println("I'mw aiting");
-//                wait.wait();
-//                System.out.println("Let's go home");
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-
     }
 
     byte[] asQuestionName(String adr,int type, int clazz) throws UnsupportedEncodingException {

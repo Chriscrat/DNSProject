@@ -8,9 +8,33 @@ import java.util.Arrays;
  */
 public class ByteConversionTool {
 
-    public static int bytesToInt(byte byteLight, byte byteHeavy) {
+    public static int bytesToInt(byte byteHeavy, byte byteLight) {
         return byteLight & 0xFF |
                 (byteHeavy & 0xFF) << 8;
+    }
+
+    public static long bytesToLong(byte byteHeavy,byte byteMedHeavy, byte byteMedLight, byte byteLight) {
+        return byteLight & 0xFF |
+                (byteMedLight & 0xFF) << 8 |
+                (byteMedLight & 0xFF) << 16 |
+                (byteMedHeavy & 0xFF) << 24 |
+                (byteHeavy & 0xFF) << 32
+                ;
+    }
+
+    public static long bytesToLong(int offset, int length, byte[] source){
+        assert 9 > length && 0 < length;
+
+        long res = 0;
+        short combo = 0;
+
+        while(0 < length) {
+            res|= source[offset+(--length)] << (combo * 2);
+            combo = combo == 0 ? 4 : combo;
+        }
+
+        return res;
+
     }
 
     public static int bytesToInt(byte byteLight) {

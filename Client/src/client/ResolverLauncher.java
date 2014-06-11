@@ -2,8 +2,10 @@ package client;
 
 import request.Header;
 import request.Question;
+import request.ResourceRecord;
 import utils.ByteConversionTool;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +23,24 @@ public class ResolverLauncher {
         Resolver resolver = new Resolver();
 
         try {
-              byte[] answer =  resolver.ask("8.8.8.8", "www.google.com");
+              byte[] answer =  resolver.ask("8.8.8.8", "www.nofrag.com");
+
+            String ansStr = ByteConversionTool.asciiBytesToString(answer.length,0,answer);
+
 
             Header header = DNSRequestParser.parseHeader(answer);
-            List<Question> questions = new ArrayList<>();
+            List<Question> questions = new ArrayList<>(header.QDCOUNT);
             int offset = DNSRequestParser.parseAnswers(header.QDCOUNT,answer,questions);
 
-            System.out.println(ByteConversionTool.asciiBytesToString(answer.length - offset,offset,answer));
+            List<ResourceRecord> answers = new ArrayList<>(header.ANCOUNT);
+            List<ResourceRecord> authority = new ArrayList<>(header.NSCOUNT);
+            List<ResourceRecord> additional = new ArrayList<>(header.ARCOUNT);
 
+            offset = DNSRequestParser.parseResource(header.ANCOUNT,offset,answer,answers);
+            offset = DNSRequestParser.parseResource(header.NSCOUNT,offset,answer,authority);
+            offset = DNSRequestParser.parseResource(header.ARCOUNT,offset,answer,additional);
+
+            System.out.println(offset);
 
         } catch (IOException e) {
             e.printStackTrace();
